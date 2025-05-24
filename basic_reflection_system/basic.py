@@ -22,7 +22,7 @@ def generate_node(state):
 
 
 def reflect_node(state):
-    response = reflection_chain.invoke({"message": state})
+    response = reflection_chain.invoke({"messages": state})
     # set reflection message as if it was from a human
     return [HumanMessage(content=response.content)]
 
@@ -50,3 +50,8 @@ app = graph.compile()
 
 print(app.get_graph().draw_mermaid())
 app.get_graph().print_ascii()
+
+
+response = app.invoke(HumanMessage(content="AI Agents taking over content creation"))
+
+print(response)
