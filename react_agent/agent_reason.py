@@ -1,17 +1,17 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-from dotenv import load_dotenv
-from langchain.agents import initialize_agent, tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import tool, create_react_agent
 from langchain_community.tools import TavilySearchResults
+from langchain import hub
+from dotenv import load_dotenv
 import datetime
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
-
+llm = ChatOpenAI(model="gpt-4")
 search_tool = TavilySearchResults(search_depth="basic")
 
 
-@tool  # let langchain know it's a tool
+@tool
 def get_system_time(format: str = "%Y-%m %d %H:%M:%S"):
     """Returns the current date and time"""
     current_time = datetime.datetime.now()
@@ -21,10 +21,6 @@ def get_system_time(format: str = "%Y-%m %d %H:%M:%S"):
 
 tools = [search_tool, get_system_time]
 
-agent = initialize_agent(
-    tools=tools, llm=llm, agent="zero-shot-react-description", verbose=True
-)
+react_prmopt = hub.pull("hwchase17/react")
 
-result = llm.invoke("Give me a fact about cats")
-
-print(result)
+react_agent_runnable = create_react_agent(tools=tools, llm=llm, prompt=react_prmopt)
